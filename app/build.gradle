@@ -39,6 +39,11 @@ dependencies {
     compile "com.google.dagger:dagger:$versions.dagger"
     annotationProcessor "com.google.dagger:dagger-compiler:$versions.dagger"
 
+    //moxy
+    compile 'com.arello-mobile:moxy:1.2.1'
+    compile 'com.arello-mobile:moxy-app-compat:1.2.1'
+    annotationProcessor 'com.arello-mobile:moxy-compiler:1.2.1'
+
     //network
     compile "com.google.code.gson:gson:$versions.gson"
 

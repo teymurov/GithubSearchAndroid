@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Github Search</string>
     <string name="github_api_url">https://api.github.com</string>
+
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="empty_field">Empty field</string>
+    <string name="auth_button">Login</string>
+    <string name="skip_button">Skip</string>
+
 </resources>

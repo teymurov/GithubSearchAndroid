@@ -7,6 +7,7 @@ import javax.inject.Singleton;
 import dagger.Component;
 import ru.teymurov.githubsearch.dagger.application.modules.AppModule;
 import ru.teymurov.githubsearch.dagger.application.modules.RetrofitModule;
+import ru.teymurov.githubsearch.mvp.presenters.AuthPresenter;
 import ru.teymurov.githubsearch.retrofit.api.GithubApi;
 
 @Singleton
@@ -14,4 +15,6 @@ import ru.teymurov.githubsearch.retrofit.api.GithubApi;
 public interface AppComponent {
     Context getContext();
     GithubApi getGithubApi();
+
+    void inject(AuthPresenter presenter);
 }
