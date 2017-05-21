@@ -44,6 +44,7 @@ dependencies {
 
     compile "com.squareup.retrofit2:retrofit:$versions.retrofit"
     compile "com.squareup.retrofit2:converter-gson:$versions.retrofit"
+    compile "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit"
 
     compile "com.squareup.okhttp3:okhttp:$versions.okhttp"
     compile "com.squareup.okhttp3:logging-interceptor:$versions.loggingInterceptor"
