@@ -19,25 +19,25 @@ public class AuthActivity extends MvpAppCompatActivity implements AuthView {
     @InjectPresenter
     AuthPresenter mAuthPresenter;
 
-    private ActivityAuthBinding mActivityAuthBinding;
     private AlertDialog mErrorDialog;
+    private ActivityAuthBinding mAuthBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mActivityAuthBinding = DataBindingUtil.setContentView(this, R.layout.activity_auth);
+        mAuthBinding = DataBindingUtil.setContentView(this, R.layout.activity_auth);
     }
 
     @Override
     public void startAuth() {
-        mActivityAuthBinding.authForm.setVisibility(View.GONE);
-        mActivityAuthBinding.progressBar.setVisibility(View.VISIBLE);
+        mAuthBinding.authForm.setVisibility(View.GONE);
+        mAuthBinding.progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void finishAuth() {
-        mActivityAuthBinding.authForm.setVisibility(View.VISIBLE);
-        mActivityAuthBinding.progressBar.setVisibility(View.GONE);
+        mAuthBinding.authForm.setVisibility(View.VISIBLE);
+        mAuthBinding.progressBar.setVisibility(View.GONE);
     }
 
     @Override
@@ -46,9 +46,9 @@ public class AuthActivity extends MvpAppCompatActivity implements AuthView {
     }
 
     @Override
-    public void showFormError(boolean isEmailError, boolean isPasswordError) {
-        mActivityAuthBinding.emailInput.setError(isEmailError ? getString(R.string.empty_field) : null);
-        mActivityAuthBinding.passwordInput.setError(isPasswordError ? getString(R.string.empty_field) : null);
+    public void showFormError(boolean isEmailValid, boolean isPasswordValid) {
+        mAuthBinding.emailInput.setError(isEmailValid ? null : getString(R.string.empty_field));
+        mAuthBinding.passwordInput.setError(isPasswordValid ? null : getString(R.string.empty_field));
     }
 
     @Override
@@ -69,8 +69,8 @@ public class AuthActivity extends MvpAppCompatActivity implements AuthView {
 
     public void onLoginClick(View view) {
         mAuthPresenter.auth(
-                mActivityAuthBinding.emailText.getText().toString(),
-                mActivityAuthBinding.passwordText.getText().toString()
+                mAuthBinding.emailText.getText().toString(),
+                mAuthBinding.passwordText.getText().toString()
         );
     }
 
