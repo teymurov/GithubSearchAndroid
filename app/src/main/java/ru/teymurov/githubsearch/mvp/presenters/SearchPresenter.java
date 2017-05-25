@@ -14,8 +14,10 @@ import retrofit2.Response;
 import ru.teymurov.githubsearch.dagger.DaggerCore;
 import ru.teymurov.githubsearch.mvp.views.SearchView;
 import ru.teymurov.githubsearch.retrofit.api.GithubApi;
+import ru.teymurov.githubsearch.retrofit.errors.ApiError;
 import ru.teymurov.githubsearch.retrofit.gson.Repository;
 import ru.teymurov.githubsearch.retrofit.gson.SearchResult;
+import ru.teymurov.githubsearch.utils.ErrorUtils;
 import ru.teymurov.githubsearch.utils.PreferencesUtils;
 
 @InjectViewState
@@ -62,8 +64,14 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
         mGithubApi.search(mToken, query, page, PAGE_SIZE).enqueue(new Callback<SearchResult>() {
             @Override
             public void onResponse(Call<SearchResult> call, Response<SearchResult> response) {
-                mSearchResult = response.body();
-                onLoadingSuccess(isPageLoading, getRepositories());
+                if (response.isSuccessful()) {
+                    mSearchResult = response.body();
+                    onLoadingSuccess(isPageLoading, getRepositories());
+                } else {
+                    ApiError error = ErrorUtils.parseError(response);
+                    getViewState().failedSearch(error.getMessage());
+                }
+
                 onLoadingFinish();
             }
 

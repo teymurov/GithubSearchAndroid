@@ -14,7 +14,9 @@ import retrofit2.Response;
 import ru.teymurov.githubsearch.dagger.DaggerCore;
 import ru.teymurov.githubsearch.mvp.views.AuthView;
 import ru.teymurov.githubsearch.retrofit.api.GithubApi;
+import ru.teymurov.githubsearch.retrofit.errors.ApiError;
 import ru.teymurov.githubsearch.retrofit.gson.User;
+import ru.teymurov.githubsearch.utils.ErrorUtils;
 import ru.teymurov.githubsearch.utils.PreferencesUtils;
 
 @InjectViewState
@@ -44,9 +46,15 @@ public class AuthPresenter extends MvpPresenter<AuthView> {
             mGithubApi.auth(token).enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
-                    mPreferencesUtils.setToken(token);
                     getViewState().finishAuth();
-                    getViewState().successAuth();
+
+                    if (response.isSuccessful()) {
+                        mPreferencesUtils.setToken(token);
+                        getViewState().successAuth();
+                    } else {
+                        ApiError error = ErrorUtils.parseError(response);
+                        getViewState().failedAuth(error.getMessage());
+                    }
                 }
 
                 @Override

@@ -5,6 +5,7 @@ import android.content.Context;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import retrofit2.Retrofit;
 import ru.teymurov.githubsearch.dagger.application.modules.AppModule;
 import ru.teymurov.githubsearch.dagger.application.modules.RetrofitModule;
 import ru.teymurov.githubsearch.dagger.application.modules.UtilsModule;
@@ -19,6 +20,7 @@ import ru.teymurov.githubsearch.retrofit.api.GithubApi;
 public interface AppComponent {
     Context getContext();
     GithubApi getGithubApi();
+    Retrofit getRetrofit();
 
     void inject(SplashActivity activity);
     void inject(AuthPresenter presenter);
