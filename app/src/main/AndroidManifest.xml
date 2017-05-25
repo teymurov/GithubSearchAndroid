@@ -23,6 +23,10 @@
         <activity
             android:name=".mvp.activities.AuthActivity"
             android:theme="@style/AppTheme"/>
+
+        <activity
+            android:name=".mvp.activities.SearchActivity"
+            android:theme="@style/AppTheme"/>
     </application>
 
 </manifest>

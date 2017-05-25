@@ -2,6 +2,7 @@ package ru.teymurov.githubsearch.mvp.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.view.View;
@@ -42,7 +43,7 @@ public class AuthActivity extends MvpAppCompatActivity implements AuthView {
 
     @Override
     public void successAuth() {
-
+        startActivity(new Intent(this, SearchActivity.class));
     }
 
     @Override

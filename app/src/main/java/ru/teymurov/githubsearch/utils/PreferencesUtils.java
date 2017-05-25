@@ -14,7 +14,7 @@ public class PreferencesUtils {
     }
 
     public String getToken() {
-        return sharedPreferences.getString(TOKEN, "");
+        return sharedPreferences.getString(TOKEN, null);
     }
 
     public void setToken(String value) {

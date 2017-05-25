@@ -2,5 +2,6 @@
 
     <dimen name="min_padding">8dp</dimen>
     <dimen name="max_padding">16dp</dimen>
+    <dimen name="avatar_owner_size">128dp</dimen>
 
 </resources>

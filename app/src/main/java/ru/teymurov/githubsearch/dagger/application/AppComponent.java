@@ -10,6 +10,7 @@ import ru.teymurov.githubsearch.dagger.application.modules.RetrofitModule;
 import ru.teymurov.githubsearch.dagger.application.modules.UtilsModule;
 import ru.teymurov.githubsearch.mvp.activities.SplashActivity;
 import ru.teymurov.githubsearch.mvp.presenters.AuthPresenter;
+import ru.teymurov.githubsearch.mvp.presenters.SearchPresenter;
 import ru.teymurov.githubsearch.retrofit.api.GithubApi;
 
 @Singleton
@@ -20,4 +21,5 @@ public interface AppComponent {
 
     void inject(SplashActivity activity);
     void inject(AuthPresenter presenter);
+    void inject(SearchPresenter presenter);
 }
