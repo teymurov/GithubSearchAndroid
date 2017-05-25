@@ -43,7 +43,9 @@ public class AuthActivity extends MvpAppCompatActivity implements AuthView {
 
     @Override
     public void successAuth() {
-        startActivity(new Intent(this, SearchActivity.class));
+        final Intent intent = new Intent(this, SearchActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Override

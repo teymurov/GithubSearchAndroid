@@ -8,6 +8,7 @@ import dagger.Component;
 import ru.teymurov.githubsearch.dagger.application.modules.AppModule;
 import ru.teymurov.githubsearch.dagger.application.modules.RetrofitModule;
 import ru.teymurov.githubsearch.dagger.application.modules.UtilsModule;
+import ru.teymurov.githubsearch.mvp.activities.SearchActivity;
 import ru.teymurov.githubsearch.mvp.activities.SplashActivity;
 import ru.teymurov.githubsearch.mvp.presenters.AuthPresenter;
 import ru.teymurov.githubsearch.mvp.presenters.SearchPresenter;
@@ -21,5 +22,6 @@ public interface AppComponent {
 
     void inject(SplashActivity activity);
     void inject(AuthPresenter presenter);
+    void inject(SearchActivity activity);
     void inject(SearchPresenter presenter);
 }

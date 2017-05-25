@@ -22,9 +22,9 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         DaggerCore.getAppComponent().inject(this);
 
-        startActivity(new Intent(this, AuthActivity.class));
-
-//        final boolean isAuthorized = !TextUtils.isEmpty(mPreferencesUtils.getToken());
-//        startActivity(new Intent(this, isAuthorized ? SearchActivity.class: AuthActivity.class));
+        final boolean isAuthorized = !TextUtils.isEmpty(mPreferencesUtils.getToken());
+        final Intent intent = new Intent(this, isAuthorized ? SearchActivity.class: AuthActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 }

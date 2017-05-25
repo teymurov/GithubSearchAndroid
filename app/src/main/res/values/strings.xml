@@ -7,6 +7,9 @@
     <string name="empty_field">Empty field</string>
     <string name="auth_button">Login</string>
     <string name="skip_button">Skip</string>
-    <string name="search_title">Search repository</string>
+
+    <string name="menu_search_title">Search repository</string>
+    <string name="menu_login_title">Login</string>
+    <string name="menu_logout_title">Logout</string>
 
 </resources>

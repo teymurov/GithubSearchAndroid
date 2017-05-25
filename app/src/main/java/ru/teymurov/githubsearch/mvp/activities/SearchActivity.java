@@ -4,10 +4,13 @@ import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.text.TextUtilsCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,17 +20,24 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import ru.teymurov.githubsearch.R;
+import ru.teymurov.githubsearch.dagger.DaggerCore;
 import ru.teymurov.githubsearch.databinding.ActivitySearchBinding;
 import ru.teymurov.githubsearch.mvp.adapters.RepositoryAdapter;
 import ru.teymurov.githubsearch.mvp.presenters.SearchPresenter;
 import ru.teymurov.githubsearch.mvp.views.SearchView;
 import ru.teymurov.githubsearch.retrofit.gson.Repository;
+import ru.teymurov.githubsearch.utils.PreferencesUtils;
 
 public class SearchActivity extends MvpAppCompatActivity implements SearchView, RepositoryAdapter.OnScrollToBottomListener {
 
     @InjectPresenter
     SearchPresenter mSearchPresenter;
+
+    @Inject
+    PreferencesUtils mPreferencesUtils;
 
     private ActivitySearchBinding mBinding;
     private RepositoryAdapter mAdapter;
@@ -36,6 +46,7 @@ public class SearchActivity extends MvpAppCompatActivity implements SearchView, 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        DaggerCore.getAppComponent().inject(this);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_search);
 
         setSupportActionBar(mBinding.toolBar);
@@ -53,15 +64,46 @@ public class SearchActivity extends MvpAppCompatActivity implements SearchView, 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
-        MenuItem searchItem = menu.findItem(R.id.search_contacts);
-        android.support.v7.widget.SearchView searchView = (android.support.v7.widget.SearchView) searchItem.getActionView();
-        searchView.setMaxWidth(Integer.MAX_VALUE);
-        initSearchView(searchView);
+        MenuItem itemSearch = menu.findItem(R.id.search_contacts);
+        initSearchView(itemSearch);
+
+        final boolean isAuthorized = !TextUtils.isEmpty(mPreferencesUtils.getToken());
+        MenuItem itemLogin = menu.findItem(R.id.login);
+        MenuItem itemLogout = menu.findItem(R.id.logout);
+        itemLogin.setVisible(!isAuthorized);
+        itemLogout.setVisible(isAuthorized);
+
         return true;
     }
 
-    public void initSearchView(android.support.v7.widget.SearchView searchView) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.login:
+                startAuth();
+                return true;
+
+            case R.id.logout:
+                mPreferencesUtils.setToken(null);
+                startAuth();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void startAuth() {
+        final Intent intent = new Intent(this, AuthActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    public void initSearchView(MenuItem searchItem) {
+        android.support.v7.widget.SearchView searchView = (android.support.v7.widget.SearchView) searchItem.getActionView();
+
         if (searchView != null) {
+            searchView.setMaxWidth(Integer.MAX_VALUE);
             SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
             searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
