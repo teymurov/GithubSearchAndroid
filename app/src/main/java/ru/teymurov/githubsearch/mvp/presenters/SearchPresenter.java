@@ -46,6 +46,10 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
     }
 
     public void search(String query) {
+        if (query.equals(mLastQuery)) {
+            return;
+        }
+
         mLastQuery = query;
         if (TextUtils.isEmpty(mLastQuery)) {
             onLoadingSuccess(new ArrayList<Repository>(), false);

@@ -7,7 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v4.text.TextUtilsCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
@@ -32,6 +32,7 @@ import ru.teymurov.githubsearch.retrofit.gson.Repository;
 import ru.teymurov.githubsearch.utils.PreferencesUtils;
 
 public class SearchActivity extends MvpAppCompatActivity implements SearchView, RepositoryAdapter.OnScrollToBottomListener {
+    private final static String TAG_SAVE_QUERY = "tag_save_query";
 
     @InjectPresenter
     SearchPresenter mSearchPresenter;
@@ -42,6 +43,9 @@ public class SearchActivity extends MvpAppCompatActivity implements SearchView, 
     private ActivitySearchBinding mBinding;
     private RepositoryAdapter mAdapter;
     private AlertDialog mErrorDialog;
+
+    private String mSaveQuery;
+    private android.support.v7.widget.SearchView mSearchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +77,7 @@ public class SearchActivity extends MvpAppCompatActivity implements SearchView, 
         itemLogin.setVisible(!isAuthorized);
         itemLogout.setVisible(isAuthorized);
 
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -93,20 +97,21 @@ public class SearchActivity extends MvpAppCompatActivity implements SearchView, 
         }
     }
 
-    private void startAuth() {
-        final Intent intent = new Intent(this, AuthActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
     public void initSearchView(MenuItem searchItem) {
-        android.support.v7.widget.SearchView searchView = (android.support.v7.widget.SearchView) searchItem.getActionView();
+        mSearchView = (android.support.v7.widget.SearchView) searchItem.getActionView();
 
-        if (searchView != null) {
-            searchView.setMaxWidth(Integer.MAX_VALUE);
+        if (mSearchView != null) {
+            mSearchView.setSaveEnabled(true);
+            mSearchView.setMaxWidth(Integer.MAX_VALUE);
             SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-            searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+            mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+            if (!TextUtils.isEmpty(mSaveQuery)) {
+                searchItem.expandActionView();
+                mSearchView.setQuery(mSaveQuery, true);
+            }
+
+            mSearchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     mSearchPresenter.search(query);
@@ -119,7 +124,40 @@ public class SearchActivity extends MvpAppCompatActivity implements SearchView, 
                     return true;
                 }
             });
+
+            //fix hide search button after rotation
+            MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    mSaveQuery = null;
+                    invalidateOptionsMenu();
+                    return true;
+                }
+
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    return true;
+                }
+            });
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(TAG_SAVE_QUERY, mSearchView.getQuery().toString());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mSaveQuery = savedInstanceState.getString(TAG_SAVE_QUERY, null);
+    }
+
+    private void startAuth() {
+        final Intent intent = new Intent(this, AuthActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Override
