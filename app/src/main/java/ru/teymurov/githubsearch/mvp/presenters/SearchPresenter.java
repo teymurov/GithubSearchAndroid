@@ -1,5 +1,7 @@
 package ru.teymurov.githubsearch.mvp.presenters;
 
+import android.text.TextUtils;
+
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 
@@ -30,7 +32,6 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
     @Inject
     PreferencesUtils mPreferencesUtils;
 
-    private boolean mIsLoading = false;
     private SearchResult mSearchResult;
     private String mLastQuery;
     private String mToken;
@@ -46,8 +47,12 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
 
     public void search(String query) {
         mLastQuery = query;
-        getViewState().showLoading();
-        loadRepositories(mLastQuery, 1, false);
+        if (TextUtils.isEmpty(mLastQuery)) {
+            onLoadingSuccess(new ArrayList<Repository>(), false);
+        } else {
+            getViewState().showLoading();
+            loadRepositories(mLastQuery, 1, false);
+        }
     }
 
     public void loadNextRepositories(int currentCount) {
@@ -56,20 +61,17 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
     }
 
     private void loadRepositories(final String query, final int page, final boolean isPageLoading) {
-        if (mIsLoading) {
-            return;
-        }
-
-        mIsLoading = true;
         mGithubApi.search(mToken, query, page, PAGE_SIZE).enqueue(new Callback<SearchResult>() {
             @Override
             public void onResponse(Call<SearchResult> call, Response<SearchResult> response) {
-                if (response.isSuccessful()) {
-                    mSearchResult = response.body();
-                    onLoadingSuccess(isPageLoading, getRepositories());
-                } else {
-                    ApiError error = ErrorUtils.parseError(response);
-                    getViewState().failedSearch(error.getMessage());
+                if (mLastQuery.equals(query)) {
+                    if (response.isSuccessful()) {
+                        mSearchResult = response.body();
+                        onLoadingSuccess(getRepositories(), isPageLoading);
+                    } else {
+                        ApiError error = ErrorUtils.parseError(response);
+                        getViewState().failedSearch(error.getMessage());
+                    }
                 }
 
                 onLoadingFinish();
@@ -83,7 +85,7 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
         });
     }
 
-    private void onLoadingSuccess(boolean isPageLoading, List<Repository> repositories) {
+    private void onLoadingSuccess(List<Repository> repositories, boolean isPageLoading) {
         final boolean maybeMore = repositories.size() >= PAGE_SIZE;
         if (isPageLoading) {
             getViewState().addRepositories(repositories, maybeMore);
@@ -93,7 +95,6 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
     }
 
     private void onLoadingFinish() {
-        mIsLoading = false;
         getViewState().hideLoading();
     }
 }
