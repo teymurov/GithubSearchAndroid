@@ -32,6 +32,8 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
     @Inject
     PreferencesUtils mPreferencesUtils;
 
+    private Call<SearchResult> mSearchResultCall;
+
     private SearchResult mSearchResult;
     private String mLastQuery;
     private String mToken;
@@ -52,10 +54,18 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
 
         mLastQuery = query;
         if (TextUtils.isEmpty(mLastQuery)) {
+            stopLoadingIfExecuted();
             onLoadingSuccess(new ArrayList<Repository>(), false);
+            onLoadingFinish();
         } else {
             getViewState().showLoading();
             loadRepositories(mLastQuery, 1, false);
+        }
+    }
+
+    private void stopLoadingIfExecuted() {
+        if (mSearchResultCall != null && mSearchResultCall.isExecuted()) {
+            mSearchResultCall.cancel();
         }
     }
 
@@ -65,17 +75,18 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
     }
 
     private void loadRepositories(final String query, final int page, final boolean isPageLoading) {
-        mGithubApi.search(mToken, query, page, PAGE_SIZE).enqueue(new Callback<SearchResult>() {
+        stopLoadingIfExecuted();
+
+        mSearchResultCall = mGithubApi.search(mToken, query, page, PAGE_SIZE);
+        mSearchResultCall.enqueue(new Callback<SearchResult>() {
             @Override
             public void onResponse(Call<SearchResult> call, Response<SearchResult> response) {
-                if (mLastQuery.equals(query)) {
-                    if (response.isSuccessful()) {
-                        mSearchResult = response.body();
-                        onLoadingSuccess(getRepositories(), isPageLoading);
-                    } else {
-                        ApiError error = ErrorUtils.parseError(response);
-                        getViewState().failedSearch(error.getMessage());
-                    }
+                if (response.isSuccessful()) {
+                    mSearchResult = response.body();
+                    onLoadingSuccess(getRepositories(), isPageLoading);
+                } else {
+                    ApiError error = ErrorUtils.parseError(response);
+                    getViewState().failedSearch(error.getMessage());
                 }
 
                 onLoadingFinish();
@@ -83,8 +94,10 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
 
             @Override
             public void onFailure(Call<SearchResult> call, Throwable t) {
-                getViewState().failedSearch(t.getMessage());
-                onLoadingFinish();
+                if (!call.isCanceled()) {
+                    getViewState().failedSearch(t.getMessage());
+                    onLoadingFinish();
+                }
             }
         });
     }
