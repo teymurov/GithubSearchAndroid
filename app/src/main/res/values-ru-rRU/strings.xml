@@ -1,0 +1,13 @@
+<resources>
+
+    <string name="hint_email">Логин</string>
+    <string name="hint_password">Пароль</string>
+    <string name="empty_field">Заполните поле</string>
+    <string name="auth_button">Авторизоваться</string>
+    <string name="skip_button">Пропустить</string>
+
+    <string name="menu_search_title">Поиск репозиториев</string>
+    <string name="menu_login_title">Войти</string>
+    <string name="menu_logout_title">Выйти</string>
+
+</resources>
