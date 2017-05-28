@@ -10,4 +10,9 @@
     <string name="menu_login_title">Войти</string>
     <string name="menu_logout_title">Выйти</string>
 
+    <string name="error_message_unauthenticated">Неправильный логин или пароль</string>
+    <string name="error_message_rate_limit">Превышено количество запросов. Пожалуйста, авторизируйтесь</string>
+    <string name="error_message_query">Неверный запрос</string>
+    <string name="error_message_network">Ошибка соединения</string>
+
 </resources>

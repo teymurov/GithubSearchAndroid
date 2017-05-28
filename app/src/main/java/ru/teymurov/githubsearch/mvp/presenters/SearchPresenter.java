@@ -30,6 +30,9 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
     GithubApi mGithubApi;
 
     @Inject
+    ErrorUtils mErrorUtils;
+
+    @Inject
     PreferencesUtils mPreferencesUtils;
 
     private Call<SearchResult> mSearchResultCall;
@@ -85,8 +88,9 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
                     mSearchResult = response.body();
                     onLoadingSuccess(getRepositories(), isPageLoading);
                 } else {
-                    ApiError error = ErrorUtils.parseError(response);
-                    getViewState().failedSearch(error.getMessage());
+                    final ApiError error = ErrorUtils.parseError(response);
+                    final String errorText = mErrorUtils.getErrorMessageFromCode(response.code());
+                    getViewState().failedSearch(errorText == null ? error.getMessage() : errorText);
                 }
 
                 onLoadingFinish();
@@ -95,7 +99,8 @@ public class SearchPresenter extends MvpPresenter<SearchView> {
             @Override
             public void onFailure(Call<SearchResult> call, Throwable t) {
                 if (!call.isCanceled()) {
-                    getViewState().failedSearch(t.getMessage());
+                    final String errorText = mErrorUtils.getErrorMessageFromThrowable(t);
+                    getViewState().failedSearch(errorText == null ? t.getMessage() : errorText);
                     onLoadingFinish();
                 }
             }

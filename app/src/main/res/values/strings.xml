@@ -12,4 +12,9 @@
     <string name="menu_login_title">Login</string>
     <string name="menu_logout_title">Logout</string>
 
+    <string name="error_message_unauthenticated">Invalid login or password</string>
+    <string name="error_message_rate_limit">Api rate limit executed. Please login</string>
+    <string name="error_message_query">Invalid query</string>
+    <string name="error_message_network">Network error</string>
+
 </resources>

@@ -25,6 +25,10 @@ public class AuthPresenter extends MvpPresenter<AuthView> {
     @Inject
     GithubApi mGithubApi;
 
+
+    @Inject
+    ErrorUtils mErrorUtils;
+
     @Inject
     PreferencesUtils mPreferencesUtils;
 
@@ -53,14 +57,16 @@ public class AuthPresenter extends MvpPresenter<AuthView> {
                         getViewState().successAuth();
                     } else {
                         ApiError error = ErrorUtils.parseError(response);
-                        getViewState().failedAuth(error.getMessage());
+                        final String errorText = mErrorUtils.getErrorMessageFromCode(response.code());
+                        getViewState().failedAuth(errorText == null ? error.getMessage() : errorText);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<User> call, Throwable t) {
                     getViewState().finishAuth();
-                    getViewState().failedAuth(t.getMessage());
+                    final String errorText = mErrorUtils.getErrorMessageFromThrowable(t);
+                    getViewState().failedAuth(errorText == null ? t.getMessage() : errorText);
                 }
             });
         }
